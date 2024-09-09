@@ -1,12 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 
 type Props = {
   imgSrc: string;
+  onEntrySubmission: (e: FormEvent<HTMLFormElement>) => void;
 };
 
-export function FormElement({ imgSrc }: Props) {
-  const [newImg, setNewImg] = useState();
+export function FormElement({ imgSrc, onEntrySubmission }: Props) {
+  const [newImg, setNewImg] = useState('');
   const imgRef = useRef<HTMLImageElement>(null);
+  function handleEntrySubmission(e: FormEvent<HTMLFormElement>) {
+    onEntrySubmission(e);
+    e.currentTarget.reset();
+    setNewImg('');
+  }
   useEffect(() => {
     const changeImage = async function (): Promise<void> {
       try {
@@ -31,7 +37,7 @@ export function FormElement({ imgSrc }: Props) {
             <h1 id="formH1">New Entry</h1>
           </div>
         </div>
-        <form id="entryForm">
+        <form id="entryForm" onSubmit={handleEntrySubmission}>
           <div className="row margin-bottom-1">
             <div className="column-half">
               <img
