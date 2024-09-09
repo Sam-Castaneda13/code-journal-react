@@ -1,11 +1,11 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { addEntry, Entry, readEntry } from './data.ts';
+import { addEntry, Entry, readEntry, updateEntry } from './data.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 const imgSrc = '/placeholder-image-square.jpg';
 
 export function FormElement() {
-  const [newImg, setNewImg] = useState<string>();
   const [newTitle, setNewTitle] = useState<string>();
+  const [newImg, setNewImg] = useState<string>();
   const [newNote, setNewNote] = useState<string>();
   const [entryEdit, setEntryEdit] = useState<Entry>();
   const { id } = useParams();
@@ -13,17 +13,20 @@ export function FormElement() {
   const navigate = useNavigate();
   function handleEntrySubmission(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const d = new FormData(e.currentTarget);
-    const { formTitle, formURL, formNotes } = Object.fromEntries(d);
-    const stringFormTitle = String(formTitle);
-    const stringFormUrl = String(formURL);
-    const stringFormNotes = String(formNotes);
-    console.log(formTitle);
-    addEntry({
-      title: stringFormTitle,
-      notes: stringFormNotes,
-      photoUrl: stringFormUrl,
-    });
+    if (!entryEdit) {
+      addEntry({
+        title: newTitle ?? '',
+        notes: newNote ?? '',
+        photoUrl: newImg ?? '',
+      });
+    } else {
+      updateEntry({
+        title: newTitle ?? '',
+        notes: newNote ?? '',
+        photoUrl: newImg ?? '',
+        entryId: entryEdit.entryId,
+      });
+    }
     navigate('/entries');
   }
   useEffect(() => {
@@ -47,9 +50,12 @@ export function FormElement() {
     const getEntry = async function () {
       const editEntry = await readEntry(Number(id));
       setEntryEdit(editEntry);
+      setNewTitle(editEntry?.title);
+      setNewImg(editEntry?.photoUrl);
+      setNewNote(editEntry?.notes);
     };
     getEntry();
-  }, []);
+  }, [id]);
 
   return (
     <main>
@@ -65,7 +71,7 @@ export function FormElement() {
               <img
                 className="input-b-radius form-image"
                 id="formImage"
-                src={newImg || imgSrc}
+                src={newImg || (entryEdit?.photoUrl ?? imgSrc)}
                 alt="image of entry image"
                 ref={imgRef}
               />

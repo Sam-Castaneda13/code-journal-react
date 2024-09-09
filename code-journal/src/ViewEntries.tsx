@@ -44,7 +44,7 @@ export function ViewEntries() {
                   <div>
                     <img src={entry.photoUrl} />
                   </div>
-                  <div>
+                  <div className="split-row">
                     <h1>{entry.title}</h1>
                     <FaPencilAlt onClick={() => handleOnClick(entry.entryId)} />
                   </div>
