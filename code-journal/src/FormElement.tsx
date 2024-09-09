@@ -1,17 +1,26 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
+import { addEntry } from './data.ts';
+import { useNavigate } from 'react-router-dom';
+const imgSrc = '/placeholder-image-square.jpg';
 
-type Props = {
-  imgSrc: string;
-  onEntrySubmission: (e: FormEvent<HTMLFormElement>) => void;
-};
-
-export function FormElement({ imgSrc, onEntrySubmission }: Props) {
+export function FormElement() {
   const [newImg, setNewImg] = useState('');
   const imgRef = useRef<HTMLImageElement>(null);
+  const navigate = useNavigate();
   function handleEntrySubmission(e: FormEvent<HTMLFormElement>) {
-    onEntrySubmission(e);
-    e.currentTarget.reset();
-    setNewImg('');
+    e.preventDefault();
+    const d = new FormData(e.currentTarget);
+    const { formTitle, formURL, formNotes } = Object.fromEntries(d);
+    const stringFormTitle = String(formTitle);
+    const stringFormUrl = String(formURL);
+    const stringFormNotes = String(formNotes);
+    console.log(formTitle);
+    addEntry({
+      title: stringFormTitle,
+      notes: stringFormNotes,
+      photoUrl: stringFormUrl,
+    });
+    navigate('/entries');
   }
   useEffect(() => {
     const changeImage = async function (): Promise<void> {
@@ -29,6 +38,9 @@ export function FormElement({ imgSrc, onEntrySubmission }: Props) {
     };
     changeImage();
   }, [newImg]);
+
+  useEffect(() => {}, []);
+
   return (
     <main>
       <div className="container" data-view="entry-form">
