@@ -1,10 +1,14 @@
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { addEntry } from './data.ts';
-import { useNavigate } from 'react-router-dom';
+import { addEntry, Entry, readEntry } from './data.ts';
+import { useNavigate, useParams } from 'react-router-dom';
 const imgSrc = '/placeholder-image-square.jpg';
 
 export function FormElement() {
-  const [newImg, setNewImg] = useState('');
+  const [newImg, setNewImg] = useState<string>();
+  const [newTitle, setNewTitle] = useState<string>();
+  const [newNote, setNewNote] = useState<string>();
+  const [entryEdit, setEntryEdit] = useState<Entry>();
+  const { id } = useParams();
   const imgRef = useRef<HTMLImageElement>(null);
   const navigate = useNavigate();
   function handleEntrySubmission(e: FormEvent<HTMLFormElement>) {
@@ -39,7 +43,13 @@ export function FormElement() {
     changeImage();
   }, [newImg]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    const getEntry = async function () {
+      const editEntry = await readEntry(Number(id));
+      setEntryEdit(editEntry);
+    };
+    getEntry();
+  }, []);
 
   return (
     <main>
@@ -70,6 +80,8 @@ export function FormElement() {
                 type="text"
                 id="formTitle"
                 name="formTitle"
+                value={newTitle || (entryEdit?.title ?? '')}
+                onChange={(e) => setNewTitle(e.target.value)}
               />
               <label className="margin-bottom-1 d-block" htmlFor="photoUrk">
                 Photo URL
@@ -80,7 +92,7 @@ export function FormElement() {
                 type="text"
                 id="formURL"
                 name="formURL"
-                value={newImg}
+                value={newImg || (entryEdit?.photoUrl ?? '')}
                 onChange={(e) => setNewImg(e.target.value)}
               />
             </div>
@@ -95,6 +107,8 @@ export function FormElement() {
                 className="input-b-color text-padding input-b-radius purple-outline d-block width-100"
                 name="formNotes"
                 id="formNotes"
+                value={newNote || (entryEdit?.notes ?? '')}
+                onChange={(e) => setNewNote(e.target.value)}
                 cols={30}
                 rows={10}></textarea>
             </div>

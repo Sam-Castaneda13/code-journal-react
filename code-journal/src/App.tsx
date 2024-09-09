@@ -12,6 +12,7 @@ export default function App() {
       <Route path="/" element={<Header />}>
         <Route index element={<FormElement />}></Route>
         <Route path="entries" element={<ViewEntries />}></Route>
+        <Route path="entries/:id" element={<FormElement />}></Route>
       </Route>
     </Routes>
   );
